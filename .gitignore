@@ -1,0 +1,58 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+env/
+.venv/
+*.egg-info/
+dist/
+build/
+
+# Environment variables - NEVER commit these
+.env
+*.env
+!.env.example
+
+# ML Models (large files - use git-lfs or cloud storage)
+models/*.keras
+models/*.h5
+models/*.joblib
+models/*.pkl
+models/chroma_db/
+
+# Datasets (too large for git)
+data/raw/
+data/processed/
+
+# Node
+node_modules/
+frontend/dist/
+frontend/.env.local
+
+# Database files
+*.db
+*.sqlite
+*.sqlite3
+
+# Uploads
+backend/uploads/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
+
+# Jupyter
+.ipynb_checkpoints/

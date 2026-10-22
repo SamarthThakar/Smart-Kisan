@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Kisan Ratna 3D Holographic Card</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{width:100%;height:100%;overflow:hidden;background:transparent;font-family:'Outfit',system-ui,sans-serif}
+canvas{display:block;width:100%;height:100%;touch-action:none}
+#info{position:absolute;bottom:10px;left:50%;transform:translateX(-50%);color:rgba(21,128,61,0.8);background:rgba(255,255,255,0.85);backdrop-filter:blur(6px);padding:4px 14px;border-radius:20px;border:1px solid rgba(21,128,61,0.2);font-size:11px;font-weight:600;pointer-events:none;text-align:center;white-space:nowrap;box-shadow:0 2px 8px rgba(0,0,0,0.06)}
+@media(prefers-reduced-motion:reduce){canvas{animation:none!important}}
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<div id="info">Hover to tilt · Drag to 3D rotate · Double-click or F to flip · R to reset</div>
+
+<script type="importmap">
+{
+  "imports":{
+    "three":"https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.module.js",
+    "three/addons/":"https://cdn.jsdelivr.net/npm/three@0.180.0/examples/jsm/"
+  }
+}
+</script>
+
+<script type="module">
+import * as THREE from 'three';
+
+/* ─── Dimensions & Tuning ─── */
+const DPR = Math.min(window.devicePixelRatio || 1, 2);
+const CARD_W = 2.8;
+const CARD_H = 4.0;
+const CARD_D = 0.05;
+const CARD_R = 0.16;
+const TILT_MAX = Math.PI / 10;
+const PARTICLE_COUNT = 80;
+
+/* ─── State ─── */
+let width, height, aspect;
+let pointer = { x: 0, y: 0, tx: 0, ty: 0 };
+let tilt = { x: 0, y: 0 };
+let drag = { active: false, startX: 0, startY: 0, rotX: 0, rotY: 0 };
+let flipAngle = 0, flipTarget = 0, isFlipped = false;
+let baseZoom = 7.6;
+let zoomTarget = baseZoom, zoom = baseZoom;
+let cardRotY = 0, cardRotX = 0;
+let isHovering = false;
+let time = 0;
+
+/* ─── Canvas & Renderer ─── */
+const canvas = document.getElementById('c');
+const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true, powerPreference: 'high-performance' });
+renderer.setPixelRatio(DPR);
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.15;
+renderer.outputColorSpace = THREE.SRGBColorSpace;
+
+/* ─── Scene & Camera ─── */
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(35, 1, 0.1, 100);
+camera.position.set(0, 0, zoom);
+
+/* ─── Lights ─── */
+const ambientLight = new THREE.AmbientLight(0xfff8e8, 0.9);
+scene.add(ambientLight);
+
+const keyLight = new THREE.DirectionalLight(0xfffaed, 2.2);
+keyLight.position.set(3, 4, 4);
+scene.add(keyLight);
+
+const rimLight = new THREE.DirectionalLight(0xf59e0b, 0.8);
+rimLight.position.set(-3, -2, 2);
+scene.add(rimLight);
+
+const pointLight = new THREE.PointLight(0xfcd34d, 2.5, 12);
+pointLight.position.set(0, 0, 3);
+scene.add(pointLight);
+
+/* ─── Card Geometry ─── */
+function createRoundedRectShape(w, h, r) {
+  const s = new THREE.Shape();
+  const hw = w / 2, hh = h / 2;
+  s.moveTo(-hw + r, -hh);
+  s.lineTo(hw - r, -hh);
+  s.quadraticCurveTo(hw, -hh, hw, -hh + r);
+  s.lineTo(hw, hh - r);
+  s.quadraticCurveTo(hw, hh, hw - r, hh);
+  s.lineTo(-hw + r, hh);
+  s.quadraticCurveTo(-hw, hh, -hw, hh - r);
+  s.lineTo(-hw, -hh + r);
+  s.quadraticCurveTo(-hw, -hh, -hw + r, -hh);
+  return s;
+}
+
+const cardShape = createRoundedRectShape(CARD_W, CARD_H, CARD_R);
+const cardGeom = new THREE.ExtrudeGeometry(cardShape, {
+  depth: CARD_D,
+  bevelEnabled: true,
+  bevelThickness: 0.02,
+  bevelSize: 0.02,
+  bevelSegments: 4,
+});
+cardGeom.center();
+cardGeom.computeBoundingBox();
+const bbox = cardGeom.boundingBox;
+const sizeX = bbox.max.x - bbox.min.x;
+const sizeY = bbox.max.y - bbox.min.y;
+const posAttr = cardGeom.attributes.position;
+const uvAttr = cardGeom.attributes.uv;
+
+for (let i = 0; i < posAttr.count; i++) {
+  const x = posAttr.getX(i);
+  const y = posAttr.getY(i);
+  const u = (x - bbox.min.x) / sizeX;
+  const v = (y - bbox.min.y) / sizeY;
+  uvAttr.setXY(i, u, v);
+}
+uvAttr.needsUpdate = true;
+
+/* ─── Textures ─── */
+const textureLoader = new THREE.TextureLoader();
+const cardTexture = textureLoader.load(
+  '/assets/kisan-ratna-card.jpg',
+  () => { renderer.render(scene, camera); },
+  undefined,
+  () => { console.warn('Using procedural card texture fallback'); }
+);
+cardTexture.colorSpace = THREE.SRGBColorSpace;
+cardTexture.generateMipmaps = true;
+cardTexture.minFilter = THREE.LinearMipmapLinearFilter;
+
+/* ─── Card Back Procedural Texture (Government Verification & Soil Health) ─── */
+function createCardBackTexture() {
+  const c = document.createElement('canvas');
+  c.width = 1024;
+  c.height = 1365; // 3:4 ratio
+  const ctx = c.getContext('2d');
+
+  // Background
+  const grad = ctx.createLinearGradient(0, 0, c.width, c.height);
+  grad.addColorStop(0, '#0a2312');
+  grad.addColorStop(0.5, '#05160b');
+  grad.addColorStop(1, '#092111');
+  ctx.fillStyle = grad;
+  ctx.fillRect(0, 0, c.width, c.height);
+
+  // Outer Gold Border
+  ctx.strokeStyle = '#d4af37';
+  ctx.lineWidth = 14;
+  ctx.strokeRect(36, 36, c.width - 72, c.height - 72);
+
+  // Inner Ornate Border
+  ctx.strokeStyle = '#996515';
+  ctx.lineWidth = 4;
+  ctx.strokeRect(54, 54, c.width - 108, c.height - 108);
+
+  // Top Title
+  ctx.fillStyle = '#f59e0b';
+  ctx.font = 'bold 44px sans-serif';
+  ctx.textAlign = 'center';
+  ctx.fillText('🌾 SMART KISAN RATNA', c.width / 2, 140);
+
+  ctx.fillStyle = '#a7f3d0';
+  ctx.font = '600 24px sans-serif';
+  ctx.fillText('OFFICIAL FARMER VERIFICATION ID', c.width / 2, 185);
+
+  // Divider Line
+  ctx.strokeStyle = 'rgba(212,175,55,0.4)';
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.moveTo(100, 220);
+  ctx.lineTo(c.width - 100, 220);
+  ctx.stroke();
+
+  // Metrics Box
+  ctx.fillStyle = 'rgba(16, 185, 129, 0.08)';
+  ctx.fillRect(80, 260, c.width - 160, 280);
+  ctx.strokeStyle = 'rgba(16, 185, 129, 0.3)';
+  ctx.strokeRect(80, 260, c.width - 160, 280);
+
+  ctx.fillStyle = '#34d399';
+  ctx.font = 'bold 32px sans-serif';
+  ctx.textAlign = 'left';
+  ctx.fillText('SOIL HEALTH SCORE', 110, 315);
+
+  ctx.fillStyle = '#ffffff';
+  ctx.font = 'bold 72px sans-serif';
+  ctx.fillText('94 / 100', 110, 400);
+
+  ctx.fillStyle = '#9ca3af';
+  ctx.font = '500 24px sans-serif';
+  ctx.fillText('Nitrogen: Optimal (120 kg/ha) · Phosphorus: Good', 110, 455);
+  ctx.fillText('Potassium: High · Organic Carbon: 0.72%', 110, 495);
+
+  // Verification Badges Box
+  ctx.fillStyle = 'rgba(245, 158, 11, 0.08)';
+  ctx.fillRect(80, 580, c.width - 160, 260);
+  ctx.strokeStyle = 'rgba(245, 158, 11, 0.3)';
+  ctx.strokeRect(80, 580, c.width - 160, 260);
+
+  ctx.fillStyle = '#fbbf24';
+  ctx.font = 'bold 30px sans-serif';
+  ctx.fillText('SCHEME ELIGIBILITY & STATUS', 110, 635);
+
+  const badges = ['✓ PM-KISAN: Active', '✓ KCC Approved (₹2.4L)', '✓ FASAL BIMA: Protected', '✓ Soil Health Card: 2024'];
+  ctx.font = '600 24px sans-serif';
+  ctx.fillStyle = '#e2e8f0';
+  badges.forEach((b, i) => {
+    const col = i % 2 === 0 ? 110 : c.width / 2 + 20;
+    const row = 690 + Math.floor(i / 2) * 60;
+    ctx.fillText(b, col, row);
+  });
+
+  // QR Code Area
+  ctx.fillStyle = '#ffffff';
+  ctx.fillRect(c.width / 2 - 120, 890, 240, 240);
+
+  // Simulated QR Code Pattern
+  ctx.fillStyle = '#05160b';
+  for (let x = 0; x < 10; x++) {
+    for (let y = 0; y < 10; y++) {
+      if ((x + y * 3) % 2 === 0 || (x < 3 && y < 3) || (x > 6 && y < 3) || (x < 3 && y > 6)) {
+        ctx.fillRect(c.width / 2 - 110 + x * 22, 900 + y * 22, 18, 18);
+      }
+    }
+  }
+
+  // Footer ID
+  ctx.fillStyle = '#d4af37';
+  ctx.font = 'bold 26px monospace';
+  ctx.textAlign = 'center';
+  ctx.fillText('ID: SK-MH-PUN-2024-8831', c.width / 2, 1190);
+
+  ctx.fillStyle = '#6b7280';
+  ctx.font = '500 20px sans-serif';
+  ctx.fillText('Verified by Department of Agriculture & Farmers Welfare', c.width / 2, 1235);
+
+  const tex = new THREE.CanvasTexture(c);
+  tex.colorSpace = THREE.SRGBColorSpace;
+  return tex;
+}
+
+const backTexture = createCardBackTexture();
+
+/* ─── Front Holographic Foil Shader ─── */
+const holoVertexShader = `
+varying vec3 vNormal;
+varying vec3 vViewPosition;
+varying vec2 vUv;
+
+void main(){
+  vUv = uv;
+  vNormal = normalize(normalMatrix * normal);
+  vec4 mvPosition = modelViewMatrix * vec4(position, 1.0);
+  vViewPosition = -mvPosition.xyz;
+  gl_Position = projectionMatrix * mvPosition;
+}
+`;
+
+const holoFragmentShader = `
+uniform sampler2D tCard;
+uniform float uTime;
+uniform vec2 uPointer;
+uniform float uHover;
+uniform float uFlipProgress;
+
+varying vec3 vNormal;
+varying vec3 vViewPosition;
+varying vec2 vUv;
+
+void main(){
+  vec3 viewDir = normalize(vViewPosition);
+  vec3 normal = normalize(vNormal);
+
+  // Base card artwork
+  vec4 cardTex = texture2D(tCard, vUv);
+
+  // Fresnel edge glaze
+  float fresnel = 1.0 - abs(dot(viewDir, normal));
+  float edgeGleam = pow(fresnel, 2.6);
+
+  // Diagonal holographic foil rainbow sweep across the card
+  float foilSweep = (vUv.x * 1.6 + vUv.y * 2.2) + (uPointer.x * 0.9 + uPointer.y * 0.7) + sin(uTime * 0.4) * 0.12;
+  vec3 rainbow = 0.5 + 0.5 * cos(6.28318 * (foilSweep + vec3(0.0, 0.33, 0.67)));
+
+  // Specular light point
+  vec3 lightDir = normalize(vec3(uPointer.x * 2.2, uPointer.y * 2.2 + 1.2, 2.5));
+  vec3 halfVec = normalize(lightDir + viewDir);
+  float spec = pow(max(dot(normal, halfVec), 0.0), 40.0);
+
+  // Foil shimmer strength
+  float holoStrength = (fresnel * 0.55 + 0.2) * (0.35 + uHover * 0.5);
+
+  // Blend: Keep base card crisp, add foil rainbow sheen to gold & highlights
+  vec3 finalColor = cardTex.rgb + (rainbow * holoStrength * 0.28) + (vec3(1.0, 0.96, 0.8) * spec * 0.65);
+  finalColor += vec3(0.96, 0.76, 0.2) * edgeGleam * 0.35;
+
+  // Darken slightly on flip
+  float flipDark = 1.0 - uFlipProgress * 0.35;
+  gl_FragColor = vec4(finalColor * flipDark, 1.0);
+}
+`;
+
+const holoMaterial = new THREE.ShaderMaterial({
+  vertexShader: holoVertexShader,
+  fragmentShader: holoFragmentShader,
+  uniforms: {
+    tCard: { value: cardTexture },
+    uTime: { value: 0 },
+    uPointer: { value: new THREE.Vector2(0, 0) },
+    uHover: { value: 0 },
+    uFlipProgress: { value: 0 },
+  },
+  side: THREE.FrontSide,
+});
+
+/* ─── Back Material ─── */
+const backVertexShader = holoVertexShader;
+const backFragmentShader = `
+uniform sampler2D tBack;
+uniform float uTime;
+uniform vec2 uPointer;
+varying vec3 vNormal;
+varying vec3 vViewPosition;
+varying vec2 vUv;
+
+void main(){
+  // Mirror UV for back side
+  vec2 uvBack = vec2(1.0 - vUv.x, vUv.y);
+  vec4 backTex = texture2D(tBack, uvBack);
+
+  vec3 viewDir = normalize(vViewPosition);
+  vec3 normal = normalize(vNormal);
+  float fresnel = 1.0 - abs(dot(viewDir, normal));
+
+  // Subtle metallic gold sheen
+  vec3 sheen = vec3(0.95, 0.75, 0.25) * pow(fresnel, 2.5) * 0.4;
+  gl_FragColor = vec4(backTex.rgb + sheen, 1.0);
+}
+`;
+
+const backMaterial = new THREE.ShaderMaterial({
+  vertexShader: backVertexShader,
+  fragmentShader: backFragmentShader,
+  uniforms: {
+    tBack: { value: backTexture },
+    uTime: { value: 0 },
+    uPointer: { value: new THREE.Vector2(0, 0) },
+  },
+  side: THREE.BackSide,
+});
+
+/* ─── Card Group & Golden Frame ─── */
+const cardGroup = new THREE.Group();
+const cardFront = new THREE.Mesh(cardGeom, holoMaterial);
+const cardBack = new THREE.Mesh(cardGeom, backMaterial);
+cardGroup.add(cardFront);
+cardGroup.add(cardBack);
+
+// Polished Gold Outer Rim Frame
+const rimShape = createRoundedRectShape(CARD_W + 0.06, CARD_H + 0.06, CARD_R + 0.02);
+const innerCut = createRoundedRectShape(CARD_W - 0.02, CARD_H - 0.02, CARD_R);
+rimShape.holes.push(innerCut);
+const rimGeom = new THREE.ExtrudeGeometry(rimShape, { depth: CARD_D + 0.025, bevelEnabled: false });
+rimGeom.center();
+const rimMat = new THREE.MeshStandardMaterial({
+  color: 0xdfb13b,
+  metalness: 0.95,
+  roughness: 0.2,
+  emissive: 0x5a3e00,
+  emissiveIntensity: 0.15,
+});
+const rimMesh = new THREE.Mesh(rimGeom, rimMat);
+cardGroup.add(rimMesh);
+
+scene.add(cardGroup);
+
+/* ─── Drifting Golden Pollen Particles ─── */
+const particleGeom = new THREE.BufferGeometry();
+const particlePos = new Float32Array(PARTICLE_COUNT * 3);
+const particleSizes = new Float32Array(PARTICLE_COUNT);
+const particleSpeeds = new Float32Array(PARTICLE_COUNT);
+const particlePhases = new Float32Array(PARTICLE_COUNT);
+
+for (let i = 0; i < PARTICLE_COUNT; i++) {
+  particlePos[i * 3] = (Math.random() - 0.5) * 6;
+  particlePos[i * 3 + 1] = (Math.random() - 0.5) * 6;
+  particlePos[i * 3 + 2] = (Math.random() - 0.5) * 3 - 0.2;
+  particleSizes[i] = Math.random() * 3 + 1.2;
+  particleSpeeds[i] = Math.random() * 0.25 + 0.1;
+  particlePhases[i] = Math.random() * Math.PI * 2;
+}
+
+particleGeom.setAttribute('position', new THREE.BufferAttribute(particlePos, 3));
+particleGeom.setAttribute('aSize', new THREE.BufferAttribute(particleSizes, 1));
+particleGeom.setAttribute('aSpeed', new THREE.BufferAttribute(particleSpeeds, 1));
+particleGeom.setAttribute('aPhase', new THREE.BufferAttribute(particlePhases, 1));
+
+const particleVertShader = `
+attribute float aSize;
+attribute float aSpeed;
+attribute float aPhase;
+uniform float uTime;
+varying float vAlpha;
+
+void main(){
+  vec3 pos = position;
+  pos.y += mod(uTime * aSpeed + aPhase, 6.0) - 3.0;
+  pos.x += sin(uTime * 0.4 + aPhase) * 0.25;
+  pos.z += cos(uTime * 0.3 + aPhase * 2.0) * 0.15;
+
+  vec4 mvPos = modelViewMatrix * vec4(pos, 1.0);
+  gl_PointSize = aSize * (180.0 / (-mvPos.z));
+  gl_Position = projectionMatrix * mvPos;
+
+  float dist = length(pos.xy);
+  vAlpha = smoothstep(3.5, 0.8, dist) * 0.65;
+  vAlpha *= 0.6 + 0.4 * sin(uTime * 2.5 + aPhase * 4.0);
+}
+`;
+
+const particleFragShader = `
+varying float vAlpha;
+
+void main(){
+  float d = length(gl_PointCoord - 0.5) * 2.0;
+  if (d > 1.0) discard;
+  float alpha = smoothstep(1.0, 0.2, d) * vAlpha;
+  vec3 col = mix(vec3(1.0, 0.88, 0.35), vec3(1.0, 0.98, 0.75), d);
+  gl_FragColor = vec4(col, alpha);
+}
+`;
+
+const particleMat = new THREE.ShaderMaterial({
+  vertexShader: particleVertShader,
+  fragmentShader: particleFragShader,
+  uniforms: { uTime: { value: 0 } },
+  transparent: true,
+  depthWrite: false,
+  blending: THREE.AdditiveBlending,
+});
+
+const particles = new THREE.Points(particleGeom, particleMat);
+scene.add(particles);
+
+/* ─── Responsive Framing & Camera Zoom ─── */
+function computeFitZoom() {
+  const tanHalfFov = Math.tan(THREE.MathUtils.degToRad(camera.fov / 2));
+  // 72% framing leaves a comfortable 14% breathing border all around the card
+  const zoomH = (CARD_H / 0.72) / (2 * tanHalfFov);
+  const zoomW = (CARD_W / 0.72) / (2 * tanHalfFov * aspect);
+  return Math.max(zoomH, zoomW);
+}
+
+function resize() {
+  width = canvas.clientWidth;
+  height = canvas.clientHeight;
+  if (!width || !height) return;
+  aspect = width / height;
+  camera.aspect = aspect;
+  baseZoom = computeFitZoom();
+  zoomTarget = baseZoom;
+  zoom = baseZoom;
+  camera.position.z = zoom;
+  camera.updateProjectionMatrix();
+  renderer.setSize(width, height);
+}
+window.addEventListener('resize', resize);
+resize();
+
+/* ─── Pointer & Touch Interactions ─── */
+canvas.addEventListener('pointermove', (e) => {
+  const rect = canvas.getBoundingClientRect();
+  pointer.tx = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+  pointer.ty = -(((e.clientY - rect.top) / rect.height) * 2 - 1);
+  isHovering = true;
+
+  if (drag.active) {
+    const dx = e.clientX - drag.startX;
+    const dy = e.clientY - drag.startY;
+    cardRotY = drag.rotY + dx * 0.012;
+    cardRotX = drag.rotX - dy * 0.012;
+    cardRotX = Math.max(-Math.PI / 4, Math.min(Math.PI / 4, cardRotX));
+  }
+});
+
+canvas.addEventListener('pointerdown', (e) => {
+  drag.active = true;
+  drag.startX = e.clientX;
+  drag.startY = e.clientY;
+  drag.rotY = cardRotY;
+  drag.rotX = cardRotX;
+  canvas.setPointerCapture(e.pointerId);
+});
+
+canvas.addEventListener('pointerup', (e) => {
+  drag.active = false;
+  canvas.releasePointerCapture(e.pointerId);
+});
+
+canvas.addEventListener('pointerleave', () => {
+  isHovering = false;
+  drag.active = false;
+  pointer.tx = 0;
+  pointer.ty = 0;
+});
+
+canvas.addEventListener('dblclick', () => {
+  isFlipped = !isFlipped;
+  flipTarget = isFlipped ? Math.PI : 0;
+});
+
+canvas.addEventListener('wheel', (e) => {
+  e.preventDefault();
+  zoomTarget = Math.max(baseZoom * 0.7, Math.min(baseZoom * 1.6, zoomTarget + e.deltaY * 0.005));
+}, { passive: false });
+
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'f' || e.key === 'F') {
+    isFlipped = !isFlipped;
+    flipTarget = isFlipped ? Math.PI : 0;
+  }
+  if (e.key === 'r' || e.key === 'R') {
+    cardRotX = 0;
+    cardRotY = 0;
+    flipTarget = 0;
+    isFlipped = false;
+    zoomTarget = baseZoom;
+  }
+  if (e.key === 'ArrowLeft') cardRotY -= 0.12;
+  if (e.key === 'ArrowRight') cardRotY += 0.12;
+  if (e.key === 'ArrowUp') cardRotX = Math.min(cardRotX + 0.12, Math.PI / 4);
+  if (e.key === 'ArrowDown') cardRotX = Math.max(cardRotX - 0.12, -Math.PI / 4);
+});
+
+/* ─── Visibility ─── */
+let isVisible = true;
+document.addEventListener('visibilitychange', () => {
+  isVisible = !document.hidden;
+});
+
+/* ─── Render Loop ─── */
+function animate() {
+  requestAnimationFrame(animate);
+  if (!isVisible) return;
+
+  const dt = 1 / 60;
+  time += dt;
+
+  // Smooth pointer interpolation
+  pointer.x += (pointer.tx - pointer.x) * 0.08;
+  pointer.y += (pointer.ty - pointer.y) * 0.08;
+
+  // Smooth camera zoom
+  zoom += (zoomTarget - zoom) * 0.07;
+  camera.position.z = zoom;
+
+  // Smooth flip animation
+  flipAngle += (flipTarget - flipAngle) * 0.08;
+
+  // Tilt from pointer
+  if (!drag.active) {
+    const targetTiltX = pointer.y * TILT_MAX * 0.6;
+    const targetTiltY = pointer.x * TILT_MAX;
+    tilt.x += (targetTiltX - tilt.x) * 0.06;
+    tilt.y += (targetTiltY - tilt.y) * 0.06;
+  }
+
+  // Card orientation
+  cardGroup.rotation.x = cardRotX + tilt.x;
+  cardGroup.rotation.y = cardRotY + tilt.y + flipAngle;
+
+  // Idle gentle float when not interacting
+  if (!isHovering && !drag.active) {
+    cardGroup.rotation.y += Math.sin(time * 0.6) * 0.015;
+    cardGroup.rotation.x += Math.cos(time * 0.8) * 0.008;
+  }
+
+  // Update uniforms
+  holoMaterial.uniforms.uTime.value = time;
+  holoMaterial.uniforms.uPointer.value.set(pointer.x, pointer.y);
+  holoMaterial.uniforms.uHover.value += (((isHovering ? 1 : 0) - holoMaterial.uniforms.uHover.value) * 0.05);
+  holoMaterial.uniforms.uFlipProgress.value = Math.abs(Math.sin(flipAngle));
+
+  backMaterial.uniforms.uTime.value = time;
+  backMaterial.uniforms.uPointer.value.set(pointer.x, pointer.y);
+  particleMat.uniforms.uTime.value = time;
+
+  // Dynamic light follows pointer
+  pointLight.position.set(pointer.x * 2.8, pointer.y * 2.8, 3.2);
+
+  renderer.render(scene, camera);
+}
+
+animate();
+
+/* ─── Context Loss & Cleanup ─── */
+canvas.addEventListener('webglcontextlost', (e) => e.preventDefault());
+canvas.addEventListener('webglcontextrestored', () => resize());
+
+window.addEventListener('beforeunload', () => {
+  renderer.dispose();
+  cardGeom.dispose();
+  rimGeom.dispose();
+  particleGeom.dispose();
+  holoMaterial.dispose();
+  backMaterial.dispose();
+  rimMat.dispose();
+  particleMat.dispose();
+  cardTexture.dispose();
+  backTexture.dispose();
+});
+</script>
+</body>
+</html>

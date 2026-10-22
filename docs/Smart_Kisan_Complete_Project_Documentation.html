@@ -1,0 +1,1281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Smart Kisan - Complete Technical Project Documentation</title>
+<style>
+
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Fira+Code:wght@400;500;600&display=swap');
+    
+    :root {
+        --primary: #15803d;
+        --primary-dark: #14532d;
+        --primary-light: #22c55e;
+        --primary-subtle: #f0fdf4;
+        --secondary: #d97706;
+        --secondary-light: #fef3c7;
+        --accent: #2563eb;
+        --accent-light: #eff6ff;
+        --danger: #dc2626;
+        --danger-light: #fef2f2;
+        --neutral-900: #0f172a;
+        --neutral-800: #1e293b;
+        --neutral-700: #334155;
+        --neutral-600: #475569;
+        --neutral-500: #64748b;
+        --neutral-300: #cbd5e1;
+        --neutral-200: #e2e8f0;
+        --neutral-100: #f1f5f9;
+        --neutral-50: #f8fafc;
+        --white: #ffffff;
+    }
+    
+    * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+    }
+    
+    @page {
+        size: A4 portrait;
+        margin: 14mm 14mm 16mm 14mm;
+        @bottom-right {
+            content: counter(page);
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: 8pt;
+            color: var(--neutral-500);
+        }
+    }
+    
+    body {
+        font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        color: var(--neutral-800);
+        background: #ffffff;
+        font-size: 9.5pt;
+        line-height: 1.55;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+    
+    .page-break {
+        page-break-before: always;
+        break-before: page;
+    }
+    
+    .avoid-break {
+        page-break-inside: avoid;
+        break-inside: avoid;
+    }
+    
+    /* Cover Page */
+    .cover-container {
+        height: 100vh;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        background: linear-gradient(145deg, #0f391e 0%, #14532d 40%, #166534 80%, #1e3a8a 100%);
+        color: #ffffff;
+        padding: 60px 50px;
+        border-radius: 12px;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+        margin-bottom: 20px;
+    }
+    
+    .cover-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background: rgba(255, 255, 255, 0.15);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        padding: 6px 16px;
+        border-radius: 30px;
+        font-size: 9pt;
+        font-weight: 600;
+        letter-spacing: 0.8px;
+        text-transform: uppercase;
+        width: fit-content;
+    }
+    
+    .cover-title-group h1 {
+        font-size: 42pt;
+        font-weight: 800;
+        line-height: 1.1;
+        letter-spacing: -1px;
+        margin-top: 25px;
+        margin-bottom: 15px;
+    }
+    
+    .cover-title-group h1 span {
+        color: #86efac;
+        background: linear-gradient(90deg, #86efac, #fde047);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+    
+    .cover-tagline {
+        font-size: 15pt;
+        font-weight: 400;
+        opacity: 0.92;
+        max-width: 650px;
+        line-height: 1.45;
+        margin-bottom: 30px;
+    }
+    
+    .cover-features-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 12px;
+        margin: 30px 0;
+    }
+    
+    .cover-feature-pill {
+        background: rgba(255, 255, 255, 0.12);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        padding: 10px 14px;
+        border-radius: 8px;
+        font-size: 8.5pt;
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    
+    .cover-meta {
+        border-top: 1px solid rgba(255, 255, 255, 0.25);
+        padding-top: 25px;
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 20px;
+    }
+    
+    .cover-meta-item .label {
+        font-size: 7.5pt;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        opacity: 0.7;
+    }
+    
+    .cover-meta-item .val {
+        font-size: 10.5pt;
+        font-weight: 700;
+        margin-top: 4px;
+    }
+    
+    /* Layout and Content */
+    .content-wrap {
+        padding: 10px 5px;
+    }
+    
+    .header-bar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 2px solid var(--neutral-200);
+        padding-bottom: 10px;
+        margin-bottom: 22px;
+    }
+    
+    .header-bar .doc-tag {
+        font-size: 8pt;
+        font-weight: 700;
+        text-transform: uppercase;
+        color: var(--primary);
+        letter-spacing: 1px;
+    }
+    
+    .header-bar .doc-version {
+        font-size: 8pt;
+        color: var(--neutral-500);
+    }
+    
+    h2.section-heading {
+        font-size: 16pt;
+        font-weight: 800;
+        color: var(--primary-dark);
+        border-bottom: 2px solid var(--primary-light);
+        padding-bottom: 6px;
+        margin-top: 26px;
+        margin-bottom: 14px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    
+    h2.section-heading .sec-num {
+        background: var(--primary-dark);
+        color: #ffffff;
+        font-size: 10pt;
+        font-weight: 800;
+        width: 26px;
+        height: 26px;
+        border-radius: 6px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    h3 {
+        font-size: 11.5pt;
+        font-weight: 700;
+        color: var(--neutral-900);
+        margin-top: 18px;
+        margin-bottom: 8px;
+    }
+    
+    h4 {
+        font-size: 9.5pt;
+        font-weight: 700;
+        color: var(--neutral-700);
+        margin-top: 12px;
+        margin-bottom: 6px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    
+    p {
+        margin-bottom: 10px;
+        color: var(--neutral-700);
+    }
+    
+    ul, ol {
+        margin-left: 20px;
+        margin-bottom: 12px;
+    }
+    
+    li {
+        margin-bottom: 4px;
+        color: var(--neutral-700);
+    }
+    
+    strong {
+        color: var(--neutral-900);
+        font-weight: 600;
+    }
+    
+    /* Code and Terminal Blocks */
+    code {
+        font-family: 'Fira Code', monospace;
+        font-size: 8pt;
+        background: var(--neutral-100);
+        color: var(--primary-dark);
+        padding: 2px 5px;
+        border-radius: 4px;
+        border: 1px solid var(--neutral-200);
+    }
+    
+    pre {
+        background: #0f172a;
+        color: #e2e8f0;
+        font-family: 'Fira Code', monospace;
+        font-size: 7.8pt;
+        line-height: 1.5;
+        padding: 14px 16px;
+        border-radius: 8px;
+        overflow-x: auto;
+        margin: 10px 0 14px 0;
+        border: 1px solid #1e293b;
+    }
+    
+    .pre-tag {
+        display: inline-block;
+        background: #334155;
+        color: #cbd5e1;
+        font-family: 'Fira Code', monospace;
+        font-size: 7pt;
+        padding: 2px 8px;
+        border-radius: 4px 4px 0 0;
+        margin-bottom: -1px;
+    }
+    
+    /* Tables */
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 12px 0 16px 0;
+        font-size: 8.5pt;
+    }
+    
+    th {
+        background: var(--primary-dark);
+        color: #ffffff;
+        text-align: left;
+        padding: 8px 10px;
+        font-weight: 600;
+        font-size: 8pt;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    
+    td {
+        padding: 7px 10px;
+        border-bottom: 1px solid var(--neutral-200);
+        vertical-align: top;
+    }
+    
+    tr:nth-child(even) td {
+        background: var(--neutral-50);
+    }
+    
+    /* Cards and Grids */
+    .grid-2 {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+        margin: 10px 0 14px 0;
+    }
+    
+    .grid-3 {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 10px;
+        margin: 10px 0 14px 0;
+    }
+    
+    .card {
+        background: #ffffff;
+        border: 1px solid var(--neutral-200);
+        border-radius: 8px;
+        padding: 14px 16px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+    }
+    
+    .card.highlight {
+        border-left: 4px solid var(--primary);
+        background: var(--primary-subtle);
+    }
+    
+    .card.alert {
+        border-left: 4px solid var(--secondary);
+        background: var(--secondary-light);
+    }
+    
+    .card.info {
+        border-left: 4px solid var(--accent);
+        background: var(--accent-light);
+    }
+    
+    .stat-box {
+        text-align: center;
+        padding: 12px;
+        background: var(--neutral-50);
+        border: 1px solid var(--neutral-200);
+        border-radius: 8px;
+    }
+    
+    .stat-number {
+        font-size: 20pt;
+        font-weight: 800;
+        color: var(--primary);
+        line-height: 1;
+    }
+    
+    .stat-label {
+        font-size: 7.5pt;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: var(--neutral-600);
+        margin-top: 4px;
+    }
+    
+    /* Badges */
+    .badge {
+        display: inline-block;
+        font-size: 7pt;
+        font-weight: 700;
+        padding: 2px 7px;
+        border-radius: 12px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    
+    .badge-green { background: #dcfce7; color: #15803d; }
+    .badge-blue { background: #dbeafe; color: #1d4ed8; }
+    .badge-amber { background: #fef3c7; color: #b45309; }
+    .badge-red { background: #fee2e2; color: #b91c1c; }
+    
+    /* Endpoints */
+    .api-endpoint {
+        background: var(--neutral-900);
+        color: #ffffff;
+        padding: 8px 12px;
+        border-radius: 6px;
+        font-family: 'Fira Code', monospace;
+        font-size: 8pt;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin: 6px 0;
+    }
+    
+    .method-badge {
+        padding: 2px 7px;
+        border-radius: 4px;
+        font-size: 7pt;
+        font-weight: 800;
+    }
+    .method-get { background: #16a34a; color: white; }
+    .method-post { background: #2563eb; color: white; }
+    .method-put { background: #d97706; color: white; }
+    .method-delete { background: #dc2626; color: white; }
+    
+    .endpoint-path {
+        color: #7dd3fc;
+        font-weight: 600;
+        flex: 1;
+    }
+    
+    .endpoint-desc {
+        color: #94a3b8;
+        font-size: 7.5pt;
+        font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+    
+    /* Footer */
+    .doc-footer {
+        margin-top: 30px;
+        border-top: 1px solid var(--neutral-200);
+        padding-top: 15px;
+        text-align: center;
+        font-size: 8pt;
+        color: var(--neutral-500);
+    }
+    
+</style>
+</head>
+<body>
+
+    <div class="cover-container">
+        <div>
+            <div class="cover-badge">🌱 Comprehensive Technical Architecture & Project Guide</div>
+            <div class="cover-title-group">
+                <h1>Smart<span>Kisan</span></h1>
+                <div class="cover-tagline">
+                    An AI-Powered Agricultural Advisory Platform for Indian Farmers — Combining Deep Learning Computer Vision, Agronomic Recommendation Engines, Real-Time Mandi Intelligence, and Multilingual Generative AI.
+                </div>
+            </div>
+            
+            <div class="cover-features-grid">
+                <div class="cover-feature-pill">🍃 EfficientNetB3 Disease Detection</div>
+                <div class="cover-feature-pill">🌱 Random Forest Crop Recommendation</div>
+                <div class="cover-feature-pill">☀️ Open-Meteo Weather Advisory</div>
+                <div class="cover-feature-pill">📊 APMC Mandi Price Intelligence</div>
+                <div class="cover-feature-pill">🏛️ National Schemes Directory</div>
+                <div class="cover-feature-pill">🤖 Gemini 1.5 Flash Multilingual RAG</div>
+            </div>
+        </div>
+        
+        <div class="cover-meta">
+            <div class="cover-meta-item">
+                <div class="label">Backend Architecture</div>
+                <div class="val">FastAPI + Python 3.13</div>
+            </div>
+            <div class="cover-meta-item">
+                <div class="label">Frontend Stack</div>
+                <div class="val">React 19 + Vite</div>
+            </div>
+            <div class="cover-meta-item">
+                <div class="label">Database Layer</div>
+                <div class="val">SQLAlchemy + SQLite / PostgreSQL</div>
+            </div>
+            <div class="cover-meta-item">
+                <div class="label">Languages Supported</div>
+                <div class="val">English, Hindi, Marathi</div>
+            </div>
+        </div>
+    </div>
+    
+<div class="content-wrap">
+
+    <div class="page-break"></div>
+    <div class="header-bar">
+        <span class="doc-tag">Smart Kisan Project Guide</span>
+        <span class="doc-version">Section 1 &bull; Overview & Mission</span>
+    </div>
+
+    <h2 class="section-heading"><span class="sec-num">1</span> Project Overview & Core Mission</h2>
+    
+    <p><strong>Smart Kisan</strong> ("Smart Farmer") is an end-to-end, full-stack, artificial intelligence-powered agricultural advisory platform created specifically to address the structural technology divide in Indian agriculture. Over 140 million farming households in India face recurring agricultural and economic vulnerabilities due to five fundamental challenges:</p>
+
+    <div class="grid-2">
+        <div class="card alert">
+            <h4>1. Asymmetric Crop Health Information</h4>
+            <p>Farmers often fail to diagnose fungal and bacterial leaf diseases until irreversible damage occurs. Agricultural extension officers (Krishi Vigyan Kendras) are understaffed and geographically distant from remote villages.</p>
+        </div>
+        <div class="card alert">
+            <h4>2. Suboptimal Crop Selection</h4>
+            <p>Sowing choices are frequently based on tradition or speculative market hype rather than objective soil chemistry (Nitrogen, Phosphorus, Potassium, pH) and seasonal meteorological forecasts.</p>
+        </div>
+        <div class="card alert">
+            <h4>3. Market Mandi Price Exploitation</h4>
+            <p>Middlemen (arhtiyas) leverage price opacity in regional Agricultural Produce Market Committees (APMCs) to purchase farmer harvests well below prevailing modal market rates.</p>
+        </div>
+        <div class="card alert">
+            <h4>4. Underutilization of Government Welfare</h4>
+            <p>Billions of rupees allocated under PM-KISAN, PMFBY (Crop Insurance), and Kisan Credit Card (KCC) remain unclaimed because eligibility rules are buried in complex government portals.</p>
+        </div>
+    </div>
+
+    <div class="card highlight">
+        <h4>The Smart Kisan Solution</h4>
+        <p>Smart Kisan consolidates six distinct agricultural domains into a single, high-performance, mobile-first web ecosystem accessible across desktop, tablet, and smartphone browsers in the farmer's native tongue (English, Hindi, and Marathi):</p>
+        <ul style="margin-bottom:0;">
+            <li><strong>Instant Leaf Disease Diagnosis:</strong> Point-and-shoot computer vision diagnostics delivering actionable chemical treatments, preventative measures, and KVK contact recommendations within seconds.</li>
+            <li><strong>Agronomic Crop Advisor:</strong> Scientific crop recommendations matching exact soil nutrient parameters (NPK, pH) and micro-climate inputs with regional soil presets.</li>
+            <li><strong>Real-time Mandi Intelligence:</strong> Transparent pricing across major Indian markets with automatic "Best Mandi" profit optimization highlights.</li>
+            <li><strong>Precision Meteorological Alerts:</strong> 7-day hyperlocal forecast paired with rule-based operational advisories (foliar spray timing, rain shelter alerts).</li>
+            <li><strong>National Welfare Directory:</strong> Searchable repository of subsidies, loans, and insurance schemes with direct application pathways.</li>
+            <li><strong>Conversational Krishi Mitra AI:</strong> 24/7 multilingual agronomic intelligence grounded in ICAR research through Retrieval-Augmented Generation (RAG).</li>
+        </ul>
+    </div>
+
+    <div class="grid-3" style="margin-top:15px;">
+        <div class="stat-box">
+            <div class="stat-number">7</div>
+            <div class="stat-label">Production Modules</div>
+        </div>
+        <div class="stat-box">
+            <div class="stat-number">38+</div>
+            <div class="stat-label">Crop Disease Classes</div>
+        </div>
+        <div class="stat-box">
+            <div class="stat-number">22</div>
+            <div class="stat-label">Analyzed Crop Varieties</div>
+        </div>
+    </div>
+    
+
+    <div class="page-break"></div>
+    <div class="header-bar">
+        <span class="doc-tag">Smart Kisan Project Guide</span>
+        <span class="doc-version">Section 2 &bull; Architecture & Data Flow</span>
+    </div>
+
+    <h2 class="section-heading"><span class="sec-num">2</span> System Architecture & Data Flow</h2>
+    
+    <p>Smart Kisan adheres to a modern, decoupled 3-tier web architecture engineered for speed, resilience, and offline accessibility:</p>
+
+    <div class="pre-tag">System Architecture Diagram</div>
+    <pre>
+===================================================================================
+                       SMART KISAN SYSTEM ARCHITECTURE
+===================================================================================
+
+  [ CLIENT TIER : Web & Mobile Browser (localhost:5173) ]
+  React 19 + Vite + React Router v7 + Vanilla CSS Design System + i18next
+  +-------------------+ +--------------------+ +---------------------+
+  | Home & Weather    | | Leaf Disease Doctor| | Crop Advisor        |
+  +-------------------+ +--------------------+ +---------------------+
+  | Mandi Prices      | | Government Schemes | | Krishi Mitra AI Chat|
+  +-------------------+ +--------------------+ +---------------------+
+  State Layer: AuthContext (JWT + Guest Mode) | api.js (Axios Client + Bearer Auth)
+                          |
+                          | HTTP REST (JSON / Multipart Form-Data)
+                          v
+  [ APPLICATION TIER : FastAPI on Uvicorn ASGI (localhost:8000) ]
+  Middleware Layer: CORS Whitelist | SlowAPI Rate Limiter | JWT Bearer Validator
+  +-------------------------------------------------------------------------------+
+  | Routers: /auth  /predict  /recommend  /weather  /market  /schemes  /chat     |
+  +-------------------------------------------------------------------------------+
+  | ML Inference Layer:                                                           |
+  |  - EfficientNetB3 (TensorFlow Keras) -> Leaf Disease Classification           |
+  |  - Random Forest (Scikit-Learn)      -> Soil & Climate Crop Recommendation    |
+  |  - Gemini 1.5 Flash + ChromaDB       -> Multilingual Retrieval-Augmented Gen  |
+  |  - Rule Engine (weather_rules.py)    -> Farming Advisory Alert Synthesis      |
+  +-------------------------------------------------------------------------------+
+  | Data Access Layer: SQLAlchemy 2.0 ORM + Pydantic v2 Schema Validation         |
+  +-------------------------------------------------------------------------------+
+                          |
+                          | SQL / File System / Vector Index / External REST
+                          v
+  [ PERSISTENCE & EXTERNAL SERVICES TIER ]
+  +-----------------------+ +-----------------------+ +---------------------------+
+  | SQLite (smart_kisan.db)| | Leaf Uploads Storage  | | ChromaDB Vector Store     |
+  | or PostgreSQL (Prod)  | | (/uploads directory)  | | (/models/chroma_db)       |
+  +-----------------------+ +-----------------------+ +---------------------------+
+  | Open-Meteo API        | | data.gov.in API       | | Google Gemini API         |
+  | (Zero-Key Weather)    | | (APMC Mandi Rates)    | | (Generative AI Engine)    |
+  +-----------------------+ +-----------------------+ +---------------------------+
+===================================================================================
+    </pre>
+
+    <h3>Request Lifecycle & Execution Flow</h3>
+    <ol>
+        <li><strong>Client Dispatch:</strong> The user interacts with the UI. The frontend service module (<code>frontend/src/services/api.js</code>) intercepts the request and automatically attaches the JWT bearer token from <code>localStorage</code> if present.</li>
+        <li><strong>Reverse Proxy / CORS:</strong> In development, the Vite server proxies API calls from port 5173 to port 8000. In production, FastAPI's CORS middleware ensures only authorized domains can access backend endpoints.</li>
+        <li><strong>Security & Rate Limiting:</strong> SlowAPI inspects the client IP address. High-compute endpoints (such as image disease prediction) are capped at 10 requests per minute to prevent resource exhaustion.</li>
+        <li><strong>Authentication Resolution:</strong> <code>get_current_user</code> verifies token signatures using HS256. If no token is provided, requests still succeed gracefully via the built-in <em>Guest Mode</em> fallback.</li>
+        <li><strong>Business Logic & Inference:</strong> The router triggers the corresponding service. ML models are loaded lazily into memory on the first request to eliminate cold-start server lag.</li>
+        <li><strong>Database Transaction:</strong> Queries, caches, and records are committed via SQLAlchemy sessions and returned through Pydantic response models.</li>
+    </ol>
+    
+
+    <div class="page-break"></div>
+    <div class="header-bar">
+        <span class="doc-tag">Smart Kisan Project Guide</span>
+        <span class="doc-version">Section 3 &bull; Technology Stack</span>
+    </div>
+
+    <h2 class="section-heading"><span class="sec-num">3</span> Technology Stack & Architectural Rationale</h2>
+    
+    <p>Every tool and library in Smart Kisan was selected specifically for high throughput, minimal developer friction, low hosting cost, and resilience under erratic rural internet connectivity.</p>
+
+    <h3>1. Backend Engineering (Python Ecosystem)</h3>
+    <table>
+        <tr>
+            <th style="width:22%;">Package / Tool</th>
+            <th style="width:12%;">Version</th>
+            <th>Role & Architectural Rationale</th>
+        </tr>
+        <tr>
+            <td><code>fastapi</code></td>
+            <td>0.115.0</td>
+            <td>High-performance asynchronous web framework based on Starlette and Pydantic. Auto-generates OpenAPI / Swagger schemas, enforces strict type validation, and supports async I/O.</td>
+        </tr>
+        <tr>
+            <td><code>uvicorn[standard]</code></td>
+            <td>0.30.6</td>
+            <td>Lightning-fast ASGI web server implementation using uvloop and httptools. Powers development hot-reloading (<code>--reload</code>).</td>
+        </tr>
+        <tr>
+            <td><code>sqlalchemy</code></td>
+            <td>2.0.35</td>
+            <td>Production-grade Object Relational Mapper (ORM). Decouples database models from the underlying SQL dialect, enabling seamless migration from SQLite to PostgreSQL.</td>
+        </tr>
+        <tr>
+            <td><code>pydantic</code></td>
+            <td>2.9.2</td>
+            <td>Data modeling and parsing library. Ensures incoming HTTP JSON payloads conform strictly to domain expectations before reaching router logic.</td>
+        </tr>
+        <tr>
+            <td><code>python-jose</code></td>
+            <td>3.3.0</td>
+            <td>Cryptographic library for JSON Web Tokens (JWT). Signs and verifies user identity tokens using SHA-256 HMAC (HS256) with 24-hour expiration windows.</td>
+        </tr>
+        <tr>
+            <td><code>passlib[bcrypt]</code></td>
+            <td>1.7.4</td>
+            <td>Industry standard password hashing with automatic salt generation and timing-attack resistant verification.</td>
+        </tr>
+        <tr>
+            <td><code>tensorflow</code></td>
+            <td>2.17.0</td>
+            <td>Executes the pre-trained EfficientNetB3 deep learning convolutional neural network for plant disease inference.</td>
+        </tr>
+        <tr>
+            <td><code>scikit-learn</code></td>
+            <td>1.5.2</td>
+            <td>Executes the Random Forest classifier for crop recommendation and handles feature normalization with <code>StandardScaler</code>.</td>
+        </tr>
+        <tr>
+            <td><code>google-generativeai</code></td>
+            <td>0.8.2</td>
+            <td>Official SDK for Google Gemini 1.5 Flash. Delivers sub-second generative responses with high multilingual translation fidelity.</td>
+        </tr>
+        <tr>
+            <td><code>chromadb</code></td>
+            <td>0.5.7</td>
+            <td>High-performance vector database. Computes cosine similarity across indexed agronomic documents to provide grounded context for RAG.</td>
+        </tr>
+        <tr>
+            <td><code>slowapi</code></td>
+            <td>0.1.9</td>
+            <td>IP-based rate limiting middleware. Guards against denial-of-service attempts and malicious bot scraping on heavy ML endpoints.</td>
+        </tr>
+        <tr>
+            <td><code>httpx</code></td>
+            <td>0.27.2</td>
+            <td>Asynchronous HTTP client for non-blocking outbound requests to Open-Meteo and data.gov.in APIs.</td>
+        </tr>
+    </table>
+
+    <h3>2. Frontend Engineering (JavaScript Ecosystem)</h3>
+    <table>
+        <tr>
+            <th style="width:22%;">Package / Tool</th>
+            <th style="width:12%;">Version</th>
+            <th>Role & Architectural Rationale</th>
+        </tr>
+        <tr>
+            <td><code>react</code></td>
+            <td>19.2.8</td>
+            <td>Declarative component-based UI framework leveraging concurrent rendering and modern hook patterns (<code>useState</code>, <code>useEffect</code>, <code>useContext</code>).</td>
+        </tr>
+        <tr>
+            <td><code>vite</code></td>
+            <td>8.3.0</td>
+            <td>Next-generation frontend tooling providing sub-100ms Hot Module Replacement (HMR) and optimized Rollup asset bundling.</td>
+        </tr>
+        <tr>
+            <td><code>react-router-dom</code></td>
+            <td>7.18.4</td>
+            <td>Client-side routing managing URL transitions across all 7 feature modules without full browser reloads.</td>
+        </tr>
+        <tr>
+            <td><code>index.css</code></td>
+            <td>Custom</td>
+            <td>Comprehensive 58KB Vanilla CSS Design System. Avoids bulky runtime CSS-in-JS dependencies while enforcing harmonious green-amber design tokens.</td>
+        </tr>
+        <tr>
+            <td><code>i18next</code></td>
+            <td>26.4.2</td>
+            <td>Complete internationalization engine holding 200+ localized agricultural phrases in English, Hindi, and Marathi with zero remote fetch latency.</td>
+        </tr>
+        <tr>
+            <td><code>recharts</code></td>
+            <td>3.10.1</td>
+            <td>SVG charting library. Renders responsive bar graphs comparing commodity prices across Indian APMC mandis.</td>
+        </tr>
+        <tr>
+            <td><code>lucide-react</code></td>
+            <td>1.52.0</td>
+            <td>Crisp SVG iconography enhancing visual navigation for semi-literate rural users.</td>
+        </tr>
+    </table>
+    
+
+    <div class="page-break"></div>
+    <div class="header-bar">
+        <span class="doc-tag">Smart Kisan Project Guide</span>
+        <span class="doc-version">Section 4 &bull; File Inventory</span>
+    </div>
+
+    <h2 class="section-heading"><span class="sec-num">4</span> Project Directory & File Structure</h2>
+    
+    <p>The repository follows a clean separation between backend service APIs, frontend client pages, machine learning assets, and database seeds:</p>
+
+    <div class="pre-tag">Project Repository Layout</div>
+    <pre>
+Smart-Kisan/
+├── .env.example                     # Environment template defining DB, SECRET_KEY, API keys
+├── README.md                        # Developer onboarding and system launch manual
+├── smart_kisan.db                   # Root SQLite database holding persistent records
+│
+├── backend/                         # FastAPI Application Package
+│   ├── requirements.txt             # Manifest of 22 Python dependencies
+│   └── app/
+│       ├── main.py                  # Server entry point: middleware, routers, lifespans
+│       ├── config.py                # Pydantic Settings reading .env configurations
+│       ├── database.py              # Engine creation, declarative base, get_db() generator
+│       ├── models/
+│       │   └── __init__.py           # Declarative SQLAlchemy models (Users, Diseases, Crops, etc.)
+│       ├── schemas/
+│       │   └── auth.py               # Pydantic schemas validating registration & login
+│       ├── core/
+│       │   └── security.py           # Bcrypt hashing utilities, JWT encoder/decoder, auth dependency
+│       ├── routers/                  # Modular REST route controllers
+│       │   ├── auth.py               # /api/v1/auth (register, login, me, profile updates)
+│       │   ├── disease.py            # /api/v1/predict/disease (image upload & diagnosis)
+│       │   ├── crop.py               # /api/v1/recommend/crop (NPK agronomic recommendations)
+│       │   ├── weather.py            # /api/v1/weather (Open-Meteo fetch & advisory engine)
+│       │   ├── market.py             # /api/v1/market (APMC mandi pricing & historical trends)
+│       │   ├── schemes.py            # /api/v1/schemes (search & filter central/state schemes)
+│       │   ├── chat.py               # /api/v1/chat (multilingual Gemini RAG interaction)
+│       │   └── history.py            # /api/v1/history (unified farmer diagnostic history)
+│       ├── ml/                       # Machine Learning inference engines
+│       │   ├── disease_model.py       # EfficientNetB3 loader, image preprocessor, predictor
+│       │   ├── crop_model.py          # Random Forest joblib loader, scaler, prediction logic
+│       │   └── rag_engine.py          # ChromaDB vector indexer & Gemini client integration
+│       └── utils/
+│           └── weather_rules.py       # Agronomic heuristic engine generating weather advisories
+│
+├── frontend/                        # React 19 Client Application
+│   ├── package.json                 # Node dependencies and build scripts
+│   ├── vite.config.js               # Dev server configuration with backend /api proxy
+│   └── src/
+│       ├── App.jsx                   # Root layout, routing routes, Splash and Auth wrapper
+│       ├── i18n.js                   # 200+ translation keys for English, Hindi, Marathi
+│       ├── index.css                 # 58KB Vanilla CSS design system with custom properties
+│       ├── context/
+│       │   └── AuthContext.jsx       # Global authentication state, JWT storage, Guest Mode
+│       ├── services/
+│       │   └── api.js                # Axios client with automatic Bearer token interceptor
+│       ├── components/
+│       │   ├── Sidebar.jsx            # Desktop responsive sidebar navigation
+│       │   ├── TopHeader.jsx          # Header with breadcrumb trail, mobile toggle, language
+│       │   ├── BottomNav.jsx          # Mobile 5-tab fixed navigation dock
+│       │   └── SplashScreen.jsx       # 1.9-second animated branding introduction
+│       └── pages/                    # Core view components
+│           ├── Home.jsx               # Dashboard summary, quick actions, weather overview
+│           ├── DiseaseDetector.jsx    # Leaf image uploader, camera capture, diagnosis report
+│           ├── CropAdvisor.jsx        # Soil NPK form, regional presets, crop ranking view
+│           ├── MarketPrices.jsx       # Commodity selection, APMC table, Recharts chart
+│           ├── Schemes.jsx            # Government scheme cards, category filters, search
+│           ├── Chat.jsx               # Conversational AI dialogue interface with audio/chips
+│           └── Profile.jsx            # Farm data, language settings, consolidated logs
+│
+├── database/
+│   └── seed_schemes.py               # Seeds 10+ official farmer welfare schemes
+├── models/                           # Binary weights (EfficientNet, Random Forest, ChromaDB)
+├── uploads/                          # Persistent storage for uploaded leaf diagnosis photos
+└── docs/                             # Project manuals, architectural diagrams, PDF documentation
+    </pre>
+    
+
+    <div class="page-break"></div>
+    <div class="header-bar">
+        <span class="doc-tag">Smart Kisan Project Guide</span>
+        <span class="doc-version">Section 5 &bull; Feature Deep-Dive</span>
+    </div>
+
+    <h2 class="section-heading"><span class="sec-num">5</span> In-Depth Feature Breakdown</h2>
+    
+    <p>Smart Kisan is built around 7 core modules, each engineered with strict validation, real-time feedback, and offline fallback capability:</p>
+
+    <h3>1. Leaf Disease Doctor (<code>/disease</code>)</h3>
+    <div class="card">
+        <p>Allows farmers to upload or snap a photo of an infected leaf. The platform executes an AI visual diagnostic and returns a tailored disease report.</p>
+        <ul>
+            <li><strong>Input:</strong> Image file (JPEG, PNG, WebP) up to 10MB via file picker or webcam.</li>
+            <li><strong>File Validation:</strong> Validates MIME headers and inspects raw magic bytes (<code>\xFF\xD8\xFF</code> for JPEG, <code>\x89PNG</code> for PNG, <code>RIFF</code> for WebP) to prevent malicious executable injection.</li>
+            <li><strong>Inference Engine:</strong> Resizes image to 224x224 RGB, applies ImageNet normalization, and runs EfficientNetB3 inference across 38+ plant pathology classes.</li>
+            <li><strong>Output:</strong> Top-3 predicted diseases with confidence scores, severity rating (None, Medium, High), chemical treatments, cultural preventative actions, and a Krishi Vigyan Kendra (KVK) advisory notice.</li>
+            <li><strong>Built-in Samples:</strong> Includes instant 1-click test leaves (Tomato Early Blight, Healthy Potato, Corn Rust) for seamless demonstrations.</li>
+        </ul>
+    </div>
+
+    <h3>2. Crop Advisor (<code>/crop</code>)</h3>
+    <div class="card">
+        <p>Predicts the top 5 most profitable and biologically suitable crops based on soil chemistry and regional weather parameters.</p>
+        <ul>
+            <li><strong>Inputs:</strong> Nitrogen (0-200 kg/ha), Phosphorus (0-200 kg/ha), Potassium (0-200 kg/ha), pH (0-14), Temperature (&deg;C), Humidity (%), and Annual Rainfall (mm).</li>
+            <li><strong>Regional Soil Presets:</strong> Quick-fill buttons for <em>Black Cotton Soil</em> (High K, medium N/P), <em>Alluvial Soil</em> (Balanced NPK), and <em>Red Laterite</em> (Acidic, low N/P).</li>
+            <li><strong>Inference Engine:</strong> Standardizes input features via <code>StandardScaler</code> and evaluates them using a Random Forest Classifier trained on ICAR multi-crop benchmarks.</li>
+            <li><strong>Output:</strong> Ranked list of 5 crops with suitability percentages, water requirements (Low/Medium/High), optimal growing season (Kharif, Rabi, Zaid), and current market demand.</li>
+        </ul>
+    </div>
+
+    <h3>3. Weather Advisory & Alert Engine (<code>/</code>)</h3>
+    <div class="card">
+        <p>Integrates precision meteorological data with agronomic heuristic rules to safeguard crops against adverse weather events.</p>
+        <ul>
+            <li><strong>Data Provider:</strong> Open-Meteo REST API. Completely free, high-uptime, requiring zero API keys.</li>
+            <li><strong>Parameters:</strong> 7-day temperature range (min/max), relative humidity, precipitation probability, wind speed, and reference evapotranspiration (ET<sub>0</sub>).</li>
+            <li><strong>Agronomic Rule Engine (<code>weather_rules.py</code>):</strong>
+                <ul>
+                    <li><em>Foliar Spray Advisory:</em> Flags high winds (&gt;15 km/h) or impending rain (&gt;40%) to warn against wasted pesticide application.</li>
+                    <li><em>Crop Inundation Warning:</em> Alerts farmers when rainfall exceeds 50mm within 24 hours.</li>
+                    <li><em>Frost Protection Alert:</em> Warns northern farmers when night temperatures dip below 4&deg;C.</li>
+                </ul>
+            </li>
+            <li><strong>Intelligent Cache:</strong> Caches weather responses in the database for 6 hours per coordinate pair to eliminate redundant network traffic.</li>
+        </ul>
+    </div>
+
+    <h3>4. Live Mandi Market Prices (<code>/market</code>)</h3>
+    <div class="card">
+        <p>Empowers farmers to negotiate fair prices by providing real-time commodity pricing across Agricultural Produce Market Committees (APMCs).</p>
+        <ul>
+            <li><strong>Data Source:</strong> data.gov.in official Open Government Data (OGD) platform with automated fallback to realistic price simulations.</li>
+            <li><strong>Commodity Scope:</strong> 23 primary Indian crops including Rice, Wheat, Cotton, Soybean, Onion, Tomato, Mustard, and Turmeric.</li>
+            <li><strong>Market Intelligence:</strong>
+                <ul>
+                    <li>Displays Minimum, Maximum, and Modal (prevailing) prices per quintal (100 kg).</li>
+                    <li><strong>"Best Mandi" Badge:</strong> Highlights the local market offering the highest modal payout.</li>
+                    <li><strong>Recharts Interactive Graph:</strong> Renders visual price comparisons across state mandis.</li>
+                </ul>
+            </li>
+        </ul>
+    </div>
+
+    <h3>5. Government Welfare Schemes Directory (<code>/schemes</code>)</h3>
+    <div class="card">
+        <p>Centralizes welfare programs, subsidies, and credit schemes from the Ministry of Agriculture and Farmers Welfare.</p>
+        <ul>
+            <li><strong>Cataloged Schemes:</strong> PM-KISAN (&pound;6,000 direct income support), PMFBY (Pradhan Mantri Fasal Bima Yojana - crop insurance), KCC (Kisan Credit Card at 4% subsidized interest), e-NAM (National Agriculture Market), and AIF (Agriculture Infrastructure Fund).</li>
+            <li><strong>Filtering Dimensions:</strong> Scheme type (Subsidy, Insurance, Credit, Organic), state applicability, and target farmer category (Marginal, Small, Medium).</li>
+            <li><strong>Direct Action:</strong> Full eligibility breakdowns, documentation requirements, and direct external links to official government application portals.</li>
+        </ul>
+    </div>
+
+    <h3>6. Krishi Mitra Multilingual AI Specialist (<code>/chat</code>)</h3>
+    <div class="card">
+        <p>A 24/7 agricultural domain chatbot powered by Google Gemini 1.5 Flash grounded with ChromaDB vector search.</p>
+        <ul>
+            <li><strong>Multilingual Engine:</strong> Native conversational understanding and generation in <strong>English</strong>, <strong>हिंदी (Hindi)</strong>, and <strong>मराठी (Marathi)</strong>.</li>
+            <li><strong>RAG Grounding:</strong> Vector database contains verified agronomic advisories. Restricts the model from inventing unverified chemical dosages or false pricing.</li>
+            <li><strong>Conversation Memory:</strong> Retains dialogue history for multi-turn conversational follow-ups.</li>
+        </ul>
+    </div>
+
+    <h3>7. Farmer Profile & Consolidated History (<code>/profile</code>)</h3>
+    <div class="card">
+        <p>A centralized dashboard for personal farm metrics, past diagnostic reports, and application-wide preferences.</p>
+        <ul>
+            <li><strong>Farm Demographics:</strong> Landholding acreage, primary cultivated crops, state/district, and soil classification.</li>
+            <li><strong>Audit Logs:</strong> Unified chronological timeline of previous leaf disease scans (with preview thumbnails) and crop recommendation runs.</li>
+            <li><strong>Instant Localization:</strong> Allows switching the active UI language across all pages with a single click.</li>
+        </ul>
+    </div>
+    
+
+    <div class="page-break"></div>
+    <div class="header-bar">
+        <span class="doc-tag">Smart Kisan Project Guide</span>
+        <span class="doc-version">Section 6 &bull; REST API Reference</span>
+    </div>
+
+    <h2 class="section-heading"><span class="sec-num">6</span> Complete REST API Reference</h2>
+    
+    <p>All endpoints are prefixed with <code>/api/v1</code>. Interactive documentation is accessible at <code>http://127.0.0.1:8000/docs</code>.</p>
+
+    <h3>Authentication Endpoints (<code>/auth</code>)</h3>
+    <div class="api-endpoint">
+        <span class="method-badge method-post">POST</span>
+        <span class="endpoint-path">/auth/register</span>
+        <span class="endpoint-desc">Registers a farmer account with phone, full name, language, and password.</span>
+    </div>
+    <div class="api-endpoint">
+        <span class="method-badge method-post">POST</span>
+        <span class="endpoint-path">/auth/login</span>
+        <span class="endpoint-desc">Authenticates phone & password. Returns JWT access token (HS256).</span>
+    </div>
+    <div class="api-endpoint">
+        <span class="method-badge method-get">GET</span>
+        <span class="endpoint-path">/auth/me</span>
+        <span class="endpoint-desc">Fetches current profile. Requires <code>Authorization: Bearer &lt;token&gt;</code>.</span>
+    </div>
+    <div class="api-endpoint">
+        <span class="method-badge method-put">POST</span>
+        <span class="endpoint-path">/auth/profile</span>
+        <span class="endpoint-desc">Updates farm details (land size, crops, state, coordinates).</span>
+    </div>
+
+    <h3>Plant Pathology Diagnostics (<code>/predict</code>)</h3>
+    <div class="api-endpoint">
+        <span class="method-badge method-post">POST</span>
+        <span class="endpoint-path">/predict/disease</span>
+        <span class="endpoint-desc">Accepts multipart leaf image. Returns top-3 diagnoses, treatments, severity. (Rate: 10/min)</span>
+    </div>
+    <div class="api-endpoint">
+        <span class="method-badge method-get">GET</span>
+        <span class="endpoint-path">/predict/disease/history</span>
+        <span class="endpoint-desc">Returns paginated diagnostic history for the authenticated farmer.</span>
+    </div>
+
+    <h3>Agronomic Crop Recommendations (<code>/recommend</code>)</h3>
+    <div class="api-endpoint">
+        <span class="method-badge method-post">POST</span>
+        <span class="endpoint-path">/recommend/crop</span>
+        <span class="endpoint-desc">JSON payload: {N, P, K, pH, temperature, humidity, rainfall}. Returns top 5 crops.</span>
+    </div>
+
+    <h3>Weather & Advisory (<code>/weather</code>)</h3>
+    <div class="api-endpoint">
+        <span class="method-badge method-get">GET</span>
+        <span class="endpoint-path">/weather?lat=18.52&lon=73.85</span>
+        <span class="endpoint-desc">Fetches 7-day forecast & farming alerts. Cached 6 hrs per coordinate.</span>
+    </div>
+
+    <h3>Mandi Market Rates (<code>/market</code>)</h3>
+    <div class="api-endpoint">
+        <span class="method-badge method-get">GET</span>
+        <span class="endpoint-path">/market/commodities</span>
+        <span class="endpoint-desc">Returns list of all 23 trackable agricultural commodities.</span>
+    </div>
+    <div class="api-endpoint">
+        <span class="method-badge method-get">GET</span>
+        <span class="endpoint-path">/market/prices?commodity=Wheat&state=Punjab</span>
+        <span class="endpoint-desc">Fetches modal/min/max rates across APMCs with Best Mandi tag.</span>
+    </div>
+
+    <h3>Welfare Schemes (<code>/schemes</code>)</h3>
+    <div class="api-endpoint">
+        <span class="method-badge method-get">GET</span>
+        <span class="endpoint-path">/schemes?scheme_type=subsidy&q=kisan</span>
+        <span class="endpoint-desc">Searches and filters government welfare schemes.</span>
+    </div>
+    <div class="api-endpoint">
+        <span class="method-badge method-get">GET</span>
+        <span class="endpoint-path">/schemes/types</span>
+        <span class="endpoint-desc">Returns categorized scheme types with emoji icons and descriptions.</span>
+    </div>
+
+    <h3>Conversational AI (<code>/chat</code>)</h3>
+    <div class="api-endpoint">
+        <span class="method-badge method-post">POST</span>
+        <span class="endpoint-path">/chat</span>
+        <span class="endpoint-desc">Payload: {message, session_id, language}. Returns RAG-grounded response.</span>
+    </div>
+    <div class="api-endpoint">
+        <span class="method-badge method-get">GET</span>
+        <span class="endpoint-path">/chat/history</span>
+        <span class="endpoint-desc">Returns message history for active conversation session.</span>
+    </div>
+
+    <h3>System & History (<code>/history</code>, <code>/health</code>)</h3>
+    <div class="api-endpoint">
+        <span class="method-badge method-get">GET</span>
+        <span class="endpoint-path">/history?type=all</span>
+        <span class="endpoint-desc">Consolidated timeline of disease scans and crop recommendations.</span>
+    </div>
+    <div class="api-endpoint">
+        <span class="method-badge method-get">GET</span>
+        <span class="endpoint-path">/api/v1/health</span>
+        <span class="endpoint-desc">System health check: API version, database connectivity, model status.</span>
+    </div>
+    
+
+    <div class="page-break"></div>
+    <div class="header-bar">
+        <span class="doc-tag">Smart Kisan Project Guide</span>
+        <span class="doc-version">Section 7 &bull; Database Schema</span>
+    </div>
+
+    <h2 class="section-heading"><span class="sec-num">7</span> Database Architecture & Data Models</h2>
+    
+    <p>Smart Kisan uses SQLAlchemy 2.0 ORM with 10 tables. The schema supports SQLite during local development and is fully compatible with PostgreSQL in production.</p>
+
+    <h3>Primary Entities & Schema Definitions</h3>
+    <table>
+        <tr>
+            <th style="width:24%;">Table Name</th>
+            <th style="width:28%;">Primary & Foreign Keys</th>
+            <th>Core Attributes & Data Types</th>
+        </tr>
+        <tr>
+            <td><code>users</code></td>
+            <td><code>id</code> (PK, UUID String)<br>Index on <code>phone</code></td>
+            <td><code>phone</code> (VARCHAR 15, Unique), <code>password_hash</code> (VARCHAR 255), <code>full_name</code> (VARCHAR 100), <code>preferred_language</code> (VARCHAR 10), <code>is_active</code> (BOOLEAN), <code>created_at</code> (DATETIME), <code>last_login</code> (DATETIME)</td>
+        </tr>
+        <tr>
+            <td><code>farmer_profiles</code></td>
+            <td><code>id</code> (PK, UUID)<br><code>user_id</code> (FK &rarr; users.id)</td>
+            <td><code>state</code> (VARCHAR 50), <code>district</code> (VARCHAR 50), <code>latitude</code> (FLOAT), <code>longitude</code> (FLOAT), <code>land_size_acres</code> (FLOAT), <code>primary_crops</code> (JSON array), <code>farmer_category</code> (VARCHAR 20), <code>soil_type</code> (VARCHAR 50)</td>
+        </tr>
+        <tr>
+            <td><code>disease_predictions</code></td>
+            <td><code>id</code> (PK, UUID)<br><code>user_id</code> (FK &rarr; users.id)</td>
+            <td><code>image_path</code> (VARCHAR 500), <code>disease_name</code> (VARCHAR 150), <code>confidence</code> (FLOAT), <code>top3_results</code> (JSON array of predictions), <code>treatment_shown</code> (JSON array of action steps), <code>crop_type</code> (VARCHAR 100), <code>user_rating</code> (SMALLINT 1-5), <code>created_at</code> (DATETIME)</td>
+        </tr>
+        <tr>
+            <td><code>crop_recommendations</code></td>
+            <td><code>id</code> (PK, UUID)<br><code>user_id</code> (FK &rarr; users.id)</td>
+            <td><code>input_params</code> (JSON: N, P, K, pH, temp, humidity, rainfall), <code>recommended_crops</code> (JSON array of top 5 ranked crops), <code>created_at</code> (DATETIME)</td>
+        </tr>
+        <tr>
+            <td><code>weather_cache</code></td>
+            <td><code>id</code> (PK, UUID)<br>Index on <code>lat_lon_key</code></td>
+            <td><code>lat_lon_key</code> (VARCHAR 50: rounded lat/lon), <code>weather_data</code> (JSON: 7-day forecast), <code>farming_advice</code> (JSON: rules engine output), <code>expires_at</code> (DATETIME: 6h TTL)</td>
+        </tr>
+        <tr>
+            <td><code>market_prices</code></td>
+            <td><code>id</code> (PK, UUID)</td>
+            <td><code>commodity</code> (VARCHAR 50), <code>market_name</code> (VARCHAR 100), <code>state</code> (VARCHAR 50), <code>min_price</code> (FLOAT), <code>max_price</code> (FLOAT), <code>modal_price</code> (FLOAT), <code>price_date</code> (DATE), <code>source</code> (VARCHAR 20)</td>
+        </tr>
+        <tr>
+            <td><code>government_schemes</code></td>
+            <td><code>id</code> (PK, UUID)</td>
+            <td><code>scheme_name</code> (VARCHAR 150), <code>scheme_type</code> (VARCHAR 50), <code>description</code> (TEXT), <code>benefits</code> (JSON array), <code>eligibility_criteria</code> (JSON object), <code>applicable_states</code> (JSON array), <code>official_url</code> (VARCHAR 500)</td>
+        </tr>
+        <tr>
+            <td><code>chat_history</code></td>
+            <td><code>id</code> (PK, UUID)<br><code>user_id</code> (FK &rarr; users.id)</td>
+            <td><code>session_id</code> (VARCHAR 50), <code>role</code> (VARCHAR 20: user/assistant), <code>content</code> (TEXT), <code>language</code> (VARCHAR 10), <code>sources_used</code> (JSON array of citations), <code>created_at</code> (DATETIME)</td>
+        </tr>
+        <tr>
+            <td><code>notifications</code></td>
+            <td><code>id</code> (PK, UUID)<br><code>user_id</code> (FK &rarr; users.id)</td>
+            <td><code>type</code> (VARCHAR 50: weather/disease/scheme), <code>title</code> (VARCHAR 150), <code>message</code> (TEXT), <code>is_read</code> (BOOLEAN, default False), <code>created_at</code> (DATETIME)</td>
+        </tr>
+        <tr>
+            <td><code>user_feedback</code></td>
+            <td><code>id</code> (PK, UUID)<br><code>user_id</code> (FK &rarr; users.id)</td>
+            <td><code>feature</code> (VARCHAR 50), <code>prediction_id</code> (VARCHAR 50), <code>rating</code> (SMALLINT 1-5), <code>comment</code> (TEXT), <code>created_at</code> (DATETIME)</td>
+        </tr>
+    </table>
+    
+
+    <div class="page-break"></div>
+    <div class="header-bar">
+        <span class="doc-tag">Smart Kisan Project Guide</span>
+        <span class="doc-version">Section 8 &bull; Machine Learning Pipeline</span>
+    </div>
+
+    <h2 class="section-heading"><span class="sec-num">8</span> Machine Learning & AI Pipeline Deep Dive</h2>
+    
+    <p>The intelligence layer of Smart Kisan is split into three dedicated engines designed for fast inference and resilience under offline or uninstalled conditions:</p>
+
+    <h3>1. Plant Pathology Vision: EfficientNetB3 (<code>disease_model.py</code>)</h3>
+    <div class="card">
+        <p>EfficientNetB3 scales depth, width, and resolution using a compound coefficient. It balances lightweight edge inference with high diagnostic accuracy on complex leaf textures.</p>
+        <div class="pre-tag">Python Inference Pipeline</div>
+        <pre>
+# 1. Lazy Loading (Loads into RAM only upon the first diagnostic request)
+model = tf.keras.models.load_model("models/disease_model.keras")
+
+# 2. Image Preprocessing
+image = Image.open(BytesIO(image_bytes)).convert("RGB").resize((224, 224))
+img_array = np.array(image, dtype=np.float32)
+img_array = tf.keras.applications.efficientnet.preprocess_input(img_array)
+img_array = np.expand_dims(img_array, axis=0)  # Shape: [1, 224, 224, 3]
+
+# 3. Softmax Classification across 38+ plant pathology classes
+raw_probs = model.predict(img_array, verbose=0)[0]
+top3_idx = np.argsort(raw_probs)[-3:][::-1]
+predictions = [{"disease": class_names[i], "confidence": float(raw_probs[i])} for i in top3_idx]
+        </pre>
+        <p><strong>Fail-Safe Fallback:</strong> If TensorFlow binary weights are missing during local development, the system automatically falls back to high-fidelity mock diagnostic data (e.g. Tomato Late Blight at 87.3% confidence) to ensure the UI remains fully functional.</p>
+    </div>
+
+    <h3>2. Agronomic Crop Recommendation: Random Forest (<code>crop_model.py</code>)</h3>
+    <div class="card">
+        <p>Trained on the ICAR Multi-Crop dataset across 2,200 soil-climate observations covering 22 distinct crops. Uses 100 decision trees to avoid overfitting on single soil parameters.</p>
+        <div class="pre-tag">Crop Predictor Pipeline</div>
+        <pre>
+# Feature vector order: [N, P, K, pH, temperature, humidity, rainfall]
+raw_features = np.array([[n, p, k, ph, temp, humidity, rainfall]], dtype=np.float32)
+
+# StandardScaler Normalization
+scaled_features = scaler.transform(raw_features)
+
+# Class Probability Estimation
+probabilities = model.predict_proba(scaled_features)[0]
+top5_indices = np.argsort(probabilities)[-5:][::-1]
+recommendations = [
+    {"crop": label_encoder.inverse_transform([idx])[0], "suitability": round(probabilities[idx] * 100, 1)}
+    for idx in top5_indices
+]
+        </pre>
+    </div>
+
+    <h3>3. Conversational RAG Engine: Gemini 1.5 Flash + ChromaDB (<code>rag_engine.py</code>)</h3>
+    <div class="card">
+        <p>Combines sub-second LLM generation with domain-verified agricultural publications stored in a local ChromaDB vector collection:</p>
+        <ul>
+            <li><strong>Vector Storage:</strong> Indexed agricultural chunks from ICAR, extension bulletins, and government schemes using cosine similarity distance thresholds (<code>distance &lt; 0.7</code>).</li>
+            <li><strong>System Prompt Constraints:</strong> Enforces domain isolation &mdash; declines medical, political, or off-topic questions; speaks in the farmer's dialect; explicitly recommends consulting local Krishi Vigyan Kendras for severe outbreaks.</li>
+            <li><strong>Conversation Memory:</strong> Contextually threads the last 3 conversational turns to maintain dialogue coherence during follow-up questions.</li>
+        </ul>
+    </div>
+    
+
+    <div class="page-break"></div>
+    <div class="header-bar">
+        <span class="doc-tag">Smart Kisan Project Guide</span>
+        <span class="doc-version">Section 9 &bull; Frontend & Design System</span>
+    </div>
+
+    <h2 class="section-heading"><span class="sec-num">9</span> Frontend Architecture & Design System</h2>
+
+    <p>The frontend is built with React 19 and Vite. It avoids third-party CSS frameworks like Tailwind or Bootstrap in favor of a bespoke 58KB Vanilla CSS design system (<code>index.css</code>) optimized for smooth rendering on low-cost Android devices.</p>
+
+    <div class="grid-2">
+        <div class="card highlight">
+            <h4>Harmonious Design Tokens</h4>
+            <p>Built with agricultural tones: Deep Forest Green (<code>#14532d</code>), Leaf Emerald (<code>#22c55e</code>), Golden Harvest Amber (<code>#d97706</code>), and clean neutral grays for sunlight readability.</p>
+        </div>
+        <div class="card highlight">
+            <h4>Adaptive Navigation</h4>
+            <p>Desktop users get a permanent 7-item sidebar. Mobile devices switch to a fixed bottom 5-tab bar and a top bar with breadcrumb tracking.</p>
+        </div>
+    </div>
+
+    <h3>Global Authentication & The "Guest Mode" Pattern</h3>
+    <p>To prevent user friction in rural communities, Smart Kisan provides a <strong>Guest Mode</strong> managed by <code>AuthContext.jsx</code>:</p>
+    <ul>
+        <li>On load, the app checks <code>localStorage</code> for an existing JWT token.</li>
+        <li>If present, it validates the token via <code>GET /api/v1/auth/me</code> and hydrates the farmer's profile.</li>
+        <li>If absent, it automatically logs in a default guest user ("<em>Kisan Mitra (Demo)</em>"). Every feature remains accessible, ensuring zero onboarding friction for new visitors.</li>
+    </ul>
+
+    <h3>Internationalization (i18n.js)</h3>
+    <p>All UI strings across all 7 views are stored directly in <code>frontend/src/i18n.js</code>. Farmers can toggle between English, Hindi, and Marathi in real time without refreshing the page or making network requests.</p>
+    
+
+    <div class="page-break"></div>
+    <div class="header-bar">
+        <span class="doc-tag">Smart Kisan Project Guide</span>
+        <span class="doc-version">Section 10 &bull; Security & Setup</span>
+    </div>
+
+    <h2 class="section-heading"><span class="sec-num">10</span> Security, Reliability & Quality Assurance</h2>
+
+    <div class="grid-2">
+        <div class="card alert">
+            <h4>Cryptographic Token Security</h4>
+            <p>Authentication utilizes HS256 JWT tokens with a 24-hour expiration window. Passwords are salted and hashed using bcrypt via <code>passlib</code>.</p>
+        </div>
+        <div class="card alert">
+            <h4>Magic-Byte Upload Validation</h4>
+            <p>Prevents file extension spoofing by inspecting raw binary headers (JPEG, PNG, WebP) and enforcing a 10MB file size ceiling.</p>
+        </div>
+        <div class="card alert">
+            <h4>IP-Based Rate Limiting</h4>
+            <p>SlowAPI enforces 10 requests per minute on deep learning inference routes, preventing denial-of-service from malicious actors.</p>
+        </div>
+        <div class="card alert">
+            <h4>Safe ORM Parameterization</h4>
+            <p>SQLAlchemy 2.0 uses parameterized SQL queries, completely eliminating SQL injection risks across all endpoints.</p>
+        </div>
+    </div>
+
+    <h2 class="section-heading"><span class="sec-num">11</span> Step-by-Step Developer Setup Guide</h2>
+
+    <h3>1. Prerequisites</h3>
+    <p>Ensure Python 3.11+ (tested on Python 3.13) and Node.js 18+ with npm are installed on your workstation.</p>
+
+    <h3>2. Clone Repository & Setup Environment</h3>
+    <div class="pre-tag">Bash / PowerShell</div>
+    <pre>
+git clone https://github.com/your-username/Smart-Kisan.git
+cd Smart-Kisan
+
+# Copy environment variables template
+copy .env.example .env    # Windows
+# cp .env.example .env    # Linux / macOS
+    </pre>
+
+    <h3>3. Launch Backend API</h3>
+    <div class="pre-tag">Bash / PowerShell (Backend Terminal)</div>
+    <pre>
+cd backend
+python -m venv venv
+venv\Scripts\activate          # Windows (source venv/bin/activate on Linux/Mac)
+pip install -r requirements.txt
+uvicorn app.main:app --reload --host 127.0.0.1 --port 8000
+    </pre>
+    <p>The backend auto-seeds the database schema, seeds government welfare programs, and opens Swagger documentation at <code>http://127.0.0.1:8000/docs</code>.</p>
+
+    <h3>4. Launch Frontend Web Application</h3>
+    <div class="pre-tag">Bash / PowerShell (Frontend Terminal)</div>
+    <pre>
+cd frontend
+npm install
+npm run dev
+    </pre>
+    <p>Open <code>http://localhost:5173</code> in your browser to explore the running application.</p>
+
+    <h2 class="section-heading"><span class="sec-num">12</span> Production Cloud Deployment Architecture</h2>
+    <table>
+        <tr>
+            <th>Application Layer</th>
+            <th>Recommended Host</th>
+            <th>Configuration Details</th>
+        </tr>
+        <tr>
+            <td>FastAPI Backend</td>
+            <td>Render / AWS EC2 / Railway</td>
+            <td>Start command: <code>uvicorn app.main:app --host 0.0.0.0 --port $PORT</code></td>
+        </tr>
+        <tr>
+            <td>React Frontend</td>
+            <td>Vercel / Cloudflare Pages</td>
+            <td>Build command: <code>npm run build</code>, Output directory: <code>dist</code></td>
+        </tr>
+        <tr>
+            <td>Relational Database</td>
+            <td>Supabase / Neon (PostgreSQL)</td>
+            <td>Set <code>DATABASE_URL=postgresql://user:pass@host:5432/db</code> in environment variables</td>
+        </tr>
+    </table>
+
+    <div class="doc-footer">
+        <strong>Smart Kisan</strong> &bull; Complete Technical Project Documentation &bull; Version 1.0.0 &bull; Generated for Developer Evaluation
+    </div>
+    
+</div>
+</body>
+</html>
